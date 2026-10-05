@@ -1,6 +1,15 @@
 import random
 import webbrowser
 
+def vilarejo():
+    ficar = True
+    while ficar:
+        print("Você chegou ao vilarejo")
+        print("tá que nem a mente de quem faz 67 (vazia) quer ficar?")
+        loli = input("Digite: ").strip().lower()
+        if loli == "não":
+            ficar = False
+    
 def batalhar_dragrão():
     while jogador["hp"] >0 and dragão["hp"] >0:
         print("1- para atacar e 2 para curar")
@@ -32,7 +41,7 @@ def batalhar_dragrão():
             jogador["hp"] -= random.randint (3, 7)
             print(f"Seu hp{jogador['hp']}")
             print(f"Hp do dragrão:{dragão['hp']}")
-        elif dragão["hp"] <0 or dragão == 0:
+        elif dragão["hp"] <0 or dragão["hp"] == 0:
                 print("-Você me matou, como isso pode acontecer?")
     if jogador["hp"] <= 0:
         if jogador["ajudou_o_velho"]:
@@ -65,7 +74,7 @@ def batalhar_dragrão():
 chance = 0
 ouviu = 0
 dragão ={
-    "hp": -1,
+    "hp": 1000,
 }
 jogador ={
     "nome": "",
@@ -81,11 +90,15 @@ jogador ={
 }
 while jogador["vivo"]:
     if jogador["nomeado"] == False:
-        print("Seja bem vindo, jogador, ao loma, você é um cavaleiro, e precisa matar um dragrão, que mora em um torre e está artomentando o reino, qual vai ser o seu nome?")
+        print("Seja bem vindo, jogador, você é um cavaleiro, e precisa matar um dragrão, que mora em um torre e está artomentando o reino, qual vai ser o seu nome?")
         while True:
             jogador['nome'] = input("Digite: ").strip().lower()
             if jogador['nome'] == "":
                 print("nome invalido, você precisas digitar um nome.")
+            elif jogador["nome"] == "67":
+                print("volta pro roblox enzo.")
+                jogador["vivo"] = False
+                break
             elif jogador["nome"] == "sans":
                 print("não.")
             elif jogador["nome"] == "toji":
@@ -100,7 +113,7 @@ while jogador["vivo"]:
             elif jogador["nome"] == "papyrus":
                 print("EU VOU PERMITIR!!!!")
             elif jogador["nome"] == "frisk":
-                print(f"{jogador['nome']}, seja bem vindo, a loma, a sua frente tem a batalha com o dragão, a sua direita você vê uma placa dizendo: 'caminho a ruina', a sua esquerda um buraco muito fundo.")
+                print(f"{jogador['nome']}, seja bem vindo, a sua frente tem a batalha com o dragão, a sua direita você vê uma placa dizendo: 'caminho ao vilarejo', a sua esquerda um buraco muito fundo.")
                 print("1- Pular no buraco.")
                 while True:
                     egg = input("Digite: ").strip().lower()
@@ -125,7 +138,7 @@ while jogador["vivo"]:
                 print(f"{jogador['nome']}, seja bem vindo, a loma, a sua frente tem a batalha com o dragão, a sua direita você vê uma placa dizendo: 'caminho a ruina', a sua esquerda um buraco.")
                 while jogador["vivo"]:
                     print("1- Seguir reto e entrar na batalha com o Dragão")
-                    print("2- Seguir para direita e ir para essa tal ruina.")
+                    print("2- Seguir para direita e ir para o vilarejo.")
                     print("3- Pular no buraco.")
                     caminho = input("Escolha um caminho:  ").strip()
                     if caminho == "1" :
@@ -191,7 +204,7 @@ while jogador["vivo"]:
                                                     else:
                                                         print("um numero babaca.")
                                             elif escolha == "3":
-                                                print("vilarejo indisponivel")
+                                                vilarejo()
                                                 quico = False
                                                 break
                                             else:
@@ -227,7 +240,7 @@ while jogador["vivo"]:
                                                     else:
                                                             print("um numero babaca.")
                                                 elif escolha_2 == "3":
-                                                    print("vilarejo indisponivel")
+                                                    vilarejo()
                                                     quico = False
                                                     break
                                                 else:
@@ -240,13 +253,13 @@ while jogador["vivo"]:
                                             jogador["vivo"] = False
                                     break
                                 elif conversa == "2":
-                                    print("Vilarejo indisponivel.")
+                                    vilarejo()
                                     break
                                 else:
                                     print("Digite um numero valido por favor.")
                             break        
                         else:
-                            print("Vilarejo indisponivel.")
+                            vilarejo()
                     elif caminho == "3" :
                         print("Você se joga no buraco e adivinha?")
                         print("Você morre, por quê você carambas você se jogou em um buraco? tá achando que é Undertale?")
