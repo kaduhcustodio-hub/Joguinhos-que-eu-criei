@@ -1,14 +1,126 @@
 import random
 import webbrowser
 
+def ferreiro():
+    if jogador["tem_arma_e_amarmadura"]:
+        print("você já possui amardura não é necessario compra-lá novamente.")
+    elif not jogador["tem_arma_e_amarmadura"]:    
+        print("Você entra no ferreiro e encontra uma placa dizendo conjunto amardura e espada por 100 ouros")
+        print("comprar?")
+        print("1- Sim, 100 de ouro")
+        print("2- Não")
+        while True:
+            comprar_amardura = input("Digite: ")
+            if comprar_amardura == "1":
+                if jogador["ouro"] >= 100:
+                    print("Você compra a armadura e arma e se sente mais preparado para lutar contra o dragrão.")
+                    print("Você sai do ferreiro.")
+                    jogador["tem_arma_e_amarmadura"] = True
+                else:
+                    print("Você não possui dinheiro suficiente.")
+                break
+            elif comprar_amardura == "2":
+                print("Não a mais nada para comprar, você sai do ferreiro.")
+                break
+            else:
+                print("Digite um numero valido.")
+                paciencia += 1
+                if paciencia == 10:
+                    webbrowser.open("https://www.youtube.com/watch?v=Le8fc7vIaZU")
+    else:
+        webbrowser.open("https://www.youtube.com/watch?v=kIte0CuJZ5E")
+
+def enfermaria():
+        while True:
+            if (jogador["ajudou_necessitado"] and jogador["ajudou_o_velho"]) and not jogador["tem_o_remedio_XL"]:
+                if not jogador["tem_o_remedio_XL"]:
+                    print("Ao entrar na enfermeria, você vê uma pessoa vestida de batman te chamando.")
+                    print("Ir até ele?")
+                    print("1- Sim")
+                    print("2- Não")
+                    while True:
+                        receber_benção = input("Digite: ").strip().lower()
+                        if receber_benção == "1":
+                            print("Ao chegar perto ele conta que é o dev, e por te sido um otimo ser humano ele te dar uma benção.")
+                            print("e então ele some.")
+                            jogador["tem_o_remedio_XL"] = True
+                            break
+                        elif receber_benção == "2":
+                            print("você vai até o balcão fingindo que não viu ele.")
+                            break
+                        elif receber_benção == "dev?":
+                            print("Sim, é ele.")
+                        else:
+                            print("Digite um numero valido, por favor.")
+            elif jogador["matou_o_velho"] and not jogador["ajudou_necessitado"]:
+                print("todo as pessoas te olham com nojo de você.")
+                print("Ao chegar, no balcão a unica pessoa lá é uma idosa.")
+                print("Comprar remedio? Recupera 10 de hp")
+                print("1- Comprar.")
+                print("2- Sair da enfermaria.")
+                while True:
+                    velha_surda = input("Digite:")
+                    if velha_surda == "1":
+                        print("ela não te ouviu.")
+                    elif velha_surda == "2":
+                        print('ao sair, você ouve a idosa dizendo: "Tomara que morra.", e o dev concorda.')
+                        break
+                    else:
+                        print("Para matar velho e recusar ajuda é bom, mas para escrever um numero não dá conta?")
+                break
+            else:
+                print("Comprar remedio? recupera 10 de hp")
+                print("1- Sim, 10 de ouro.")
+                print("2-Não, sair da enfermaria")
+                while True:
+                    remedio = input("Digite: ")
+                    if remedio == "1":
+                        if jogador["ouro"] >= 10:
+                            jogador["ouro"] -= 10
+                            print("você comprou 1 remedio.")
+                            print("comprar novamente?")
+                            print("1-Sim    2-Não, sair da enfermaria")  
+                        else:
+                            print("Você não possui dinheiro suficiente.")
+                    elif remedio == "2":
+                        print("Você sai da enfermaria.")
+                        break
+                break
 def vilarejo():
+    if not jogador["viu_necessitado"]:
+        print("Ao entrar na Vila você vê um homem pedindo socorro apôs quebrar o joelho")
+        print("ajudar?")
+        print("1- sim")
+        print("2- não")
+        jogador["viu_necessitado"] = True
+        while True:
+            ajudar = input("Digite: ")
+            if ajudar == "1":
+                print("Você ajudou o necessitado e o levou a enfermaria")
+                jogador["ajudou_necessitado"] = True
+                jogador["ouro"] += 50
+                enfermaria()
+                break
+            elif ajudar == "2":
+                break
+            else:
+                print("Digite um numero valido por favor.")
     ficar = True
     while ficar:
-        print("Você chegou ao vilarejo")
-        print("tá que nem a mente de quem faz 67 (vazia) quer ficar?")
-        loli = input("Digite: ").strip().lower()
-        if loli == "não":
-            ficar = False
+        print("Você chegou a vila, aonde deseja ir?")
+        print("1- Ferreiro")
+        print("2- Enfermaria")
+        print("3- sair da vila")
+        aonde_vila = input("Digite: ")
+        if aonde_vila =="1":
+            ferreiro()
+        elif aonde_vila =="2":
+            enfermaria()
+        elif aonde_vila =="3":
+            break
+        else:
+            print("Digite um numero valido, por favor.")
+
     
 def batalhar_dragrão():
     while jogador["hp"] >0 and dragão["hp"] >0:
@@ -18,16 +130,56 @@ def batalhar_dragrão():
             turno = "0"
             turno = input("Digite: ").strip()
             if turno == "1":
-                dragão["hp"] -=1
-                print(f"Seu hp:{jogador['hp']}")
-                print(f"Hp dragrão:{dragão['hp']}")
+                if jogador["tem_arma_e_amarmadura"]:
+                    dragão["hp"] -=50
+                    print(f"Seu hp:{jogador['hp']}")
+                    print(f"Hp dragrão:{dragão['hp']}")
+                else:    
+                    dragão["hp"] -=1
+                    print(f"Seu hp:{jogador['hp']}")
+                    print(f"Hp dragrão:{dragão['hp']}")
             elif turno == "2":
                 if jogador["hp"] >= 100:
                     print(f"a vida está em {jogador['hp']}%, não é necessario cura")
                 else:
-                    jogador["hp"] +=5
-                    print(f"Seu Hp{jogador['hp']}")
-                    print(f"Hp dragrão:{dragão['hp']}")
+                    if jogador["tem_o_remedio_XL"] and jogador["hp"] <= 10:
+                        print("usar Benção do Dev?")
+                        print("1- Usar")
+                        print("2- Não usar")
+                        while True:
+                            usar_remedio_xl = input("Digite: ")
+                            if usar_remedio_xl == "1":
+                                jogador["tem_o_remedio_XL"] = False
+                                jogador["hp"] += 90
+                                print(f"Você usou um Benção do Dev sua vida está com {jogador['hp']}hp ")
+                                break
+                            elif usar_remedio_xl == "2":
+                                break
+                            else:
+                                print("Digite um numero valido por favor.")
+                    elif jogador["remedio"] >0 and jogador["hp"] <=90:
+                        print(f"Você possui {jogador['remedio']} remedios usar um?")
+                        print("1- Usar")
+                        print("2- Não usar")
+                        while True:
+                            usar_remedio = input("Digite: ")
+                            if jogador["matou_o_velho"]:
+                                jogador["hp"] -= 1
+                            elif usar_remedio == "1":
+                                jogador["remedio"] -= 1
+                                jogador["hp"] += 10
+                                print(f"Você usou um remedio sua vida está com {jogador['hp']}hp ")
+                                break
+                            elif usar_remedio == "2":
+                                break
+                            else:
+                                print("Digite um numero valido por favor.")
+                    else:
+                        jogador["hp"] +=5
+                        print(f"Seu Hp{jogador['hp']}")
+                        print(f"Hp dragrão:{dragão['hp']}")
+                        if not jogador["tem_arma_e_amarmadura"]:
+                            print("-O caba acha que vai me ganhar curando 5 de vida.")
             else:
                 if chance == 0:
                     if not jogador["tem_arma_e_amarmadura"]:
@@ -38,9 +190,15 @@ def batalhar_dragrão():
                 turno="0"
         if dragão["hp"] > 0:
             print("vez do dragrão")
-            jogador["hp"] -= random.randint (3, 7)
-            print(f"Seu hp{jogador['hp']}")
-            print(f"Hp do dragrão:{dragão['hp']}")
+            if jogador["tem_arma_e_amarmadura"]:
+                jogador["hp"] -= random.randint (1, 3)
+                print(f"Seu hp{jogador['hp']}")
+                print(f"Hp do dragrão:{dragão['hp']}")
+            else:
+                jogador["hp"] -= random.randint (3, 7)
+                print(f"Seu hp{jogador['hp']}")
+                print(f"Hp do dragrão:{dragão['hp']}")
+
         elif dragão["hp"] <0 or dragão["hp"] == 0:
                 print("-Você me matou, como isso pode acontecer?")
     if jogador["hp"] <= 0:
@@ -50,14 +208,14 @@ def batalhar_dragrão():
         elif jogador["matou_o_velho"]:
                print ("Graças a Deus você morreu, que queime no inferno.")
         elif jogador["tem_arma_e_amarmadura"] or jogador["tem_o_remedio_XL"]:
-                print("Você morreu.")
-        if jogador["matou_o_velho"]:
+            print("Você morreu.")
+            if jogador["matou_o_velho"]:
                 print("uma pena que não foi antes.")
-        elif jogador["ajudou_o_velho"]:
-            print("Vai com Deus guerreiro.")        
+            elif jogador["ajudou_o_velho"]:
+                print("Vai com Deus guerreiro.")        
         else:
-            print(f"ERA ÓBVIO, MAS ERA ÓBVIO. POR QUE NÃO FOI PARA O VILAREJO PRIMEIRO PARA COMPRAR, MEU AMIGO? TÁ ACHANDO QUE É O BATMAN? TÁ ACHANDO QUE É TOJI POR ACASO? VOCÊ NÃO É NENHUM DELES; VOCÊ É O {jogador['nome']}")
-        print("Você morreu.")
+                print(f"ERA ÓBVIO, MAS ERA ÓBVIO. POR QUE NÃO FOI PARA O VILAREJO PRIMEIRO PARA COMPRAR, MEU AMIGO? TÁ ACHANDO QUE É O BATMAN? TÁ ACHANDO QUE É TOJI POR ACASO? VOCÊ NÃO É NENHUM DELES; VOCÊ É O {jogador['nome']}")
+                print("Você morreu.")
     elif dragão["hp"] <=0:
         if not jogador["tem_arma_e_amarmadura"]:
             print("Que Deus tenha piedade de quem cruzar o seu caminho.")
@@ -80,8 +238,10 @@ jogador ={
     "nome": "",
     "remedio": 0,
     "hp": 100,
-    "ouro": 0,
+    "ouro": 10,
     "vivo": True,
+    "ajudou_necessitado": False,
+    "viu_necessitado": False,
     "nomeado": False,
     "ajudou_o_velho": False,
     "matou_o_velho": False,
@@ -178,13 +338,14 @@ while jogador["vivo"]:
                                             print("1- Ajudar")
                                             print("2- Matar")
                                             print("3- Fingir que não ouviu e ir para o vilarejo.")
-                                            escolha = input("Digite").strip()
+                                            escolha = input("Digite: ").strip()
                                             if escolha == "1":
                                                 print("Após entregar o controle para ele, ele volta a ter 24 anos sendo um body builder e te dá 100 de ouro")
                                                 jogador["ajudou_o_velho"] = True
                                                 jogador["ouro"] += 100
                                                 ouviu = 1
                                                 quico = False
+                                                vilarejo()
                                             elif escolha == "2": #esse cara é um babaca.
                                                 ouviu = 1
                                                 print("Você ganhou 10 de ouro e perdeu o respeito do Dev.")
