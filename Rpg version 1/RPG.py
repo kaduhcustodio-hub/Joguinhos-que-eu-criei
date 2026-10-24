@@ -24,8 +24,8 @@ def ferreiro():
                 break
             else:
                 print("Digite um numero valido.")
-                paciencia += 1
-                if paciencia == 10:
+                dragão["paciencia"] += 1
+                if dragão["paciencia"] >= 10:
                     webbrowser.open("https://www.youtube.com/watch?v=Le8fc7vIaZU")
     else:
         webbrowser.open("https://www.youtube.com/watch?v=kIte0CuJZ5E")
@@ -228,11 +228,13 @@ def batalhar_dragrão():
     if jogador["hp"] <-500 or dragão["hp"]<-500:
         webbrowser.open("https://www.youtube.com/watch?v=kIte0CuJZ5E")
     jogador["vivo"] = False
-    
+
+
 chance = 0
 ouviu = 0
 dragão ={
     "hp": 1000,
+    "paciencia": 0
 }
 jogador ={
     "nome": "",
