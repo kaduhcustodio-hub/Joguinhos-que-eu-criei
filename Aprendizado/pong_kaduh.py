@@ -52,30 +52,30 @@ class bolinha:
         pygame.draw.circle(tela,branco,(self.x,self.y),self.raio)
     def verificar_borda(self):
         global C_pts,T_pts,D_pts,E_pts
-        if self.rect.x <= 0:
+        if self.rect.x <= 0 and self.velx < 0:
             if rqt_E:
                 E_pts = True
             else:
                 self.velx *= -1
                 self.x = self.raio
-        if self.rect.y <= 0:
+        if self.rect.y <= 0 and self.vely < 0:
             if rqt_T:
                 T_pts = True
             else:
                 self.vely *= -1
-                self.y = self.raio
-        if self.rect.x >= largura_tela:
+                self.y = self.raio 
+        if self.rect.x + self.raio >= largura_tela and self.velx > 0:
             if rqt_D:
                 D_pts = True
             else:
                 self.velx *= -1
-                self.x = self.raio - largura_tela
-        if self.rect.y >= altura_tela:
+                self.x = largura_tela - self.raio
+        if self.rect.y + self.raio >= altura_tela and self.vely > 0:
             if rqt_C:
                 C_pts = True
             else:
                 self.vely *= -1
-                self.y = self.raio - altura_tela
+                self.y = altura_tela - self.raio
 class raquete:
     def __init__(self,lugar,cor):
         global rqt_C,rqt_D,rqt_T,rqt_E
@@ -149,7 +149,9 @@ class raquete:
         pygame.draw.rect(tela, self.cor,self.rect)
 
 def reiniciar_valores():
+    bolinha_de_golfe.rect.x = 400
     bolinha_de_golfe.x = 400
+    bolinha_de_golfe.rect.y = 300
     bolinha_de_golfe.y = 300
     bolinha_de_golfe.velx = -5
     bolinha_de_golfe.vely = -5
@@ -169,28 +171,28 @@ def marcar_pontos():
             pts_player2 += 1
             reiniciar_valores()
         else:
-            bolinha_de_golfe.x *= -1
+            bolinha_de_golfe.velx *= -1
         E_pts = False
     if D_pts:
         if ultimo_chute != "direita":
             pts_player1 += 1
             reiniciar_valores()
         else:
-            bolinha_de_golfe.x *= -1
+            bolinha_de_golfe.velx *= -1
         D_pts = False
     if T_pts:
         if ultimo_chute != "teto":
             pts_player2 += 1
             reiniciar_valores()
         else:
-            bolinha_de_golfe.y *= -1
+            bolinha_de_golfe.vely *= -1
         T_pts = False
     if C_pts:
         if ultimo_chute != "chão":
             pts_player1 += 1
             reiniciar_valores()
         else:
-            bolinha_de_golfe.y *= -1
+            bolinha_de_golfe.vely *= -1
         C_pts = False
             
 def colisao(): #agora eu vou ficar mentalmente insano.
@@ -200,6 +202,8 @@ def colisao(): #agora eu vou ficar mentalmente insano.
             bolinha_de_golfe.velx *= -1
             if abs(bolinha_de_golfe.velx) < 10:
                 bolinha_de_golfe.velx -= 1
+            bolinha_de_golfe.x = rqt1.rect.x - bolinha_de_golfe.raio
+            bolinha_de_golfe.rect.x = rqt1.rect.x - bolinha_de_golfe.raio
             penultimo_chute = ultimo_chute
             ultimo_chute = "direita"
             bip.play()
@@ -208,6 +212,8 @@ def colisao(): #agora eu vou ficar mentalmente insano.
             bolinha_de_golfe.velx *= -1
             if abs(bolinha_de_golfe.velx) < 10:
                 bolinha_de_golfe.velx += 1
+            bolinha_de_golfe.x = rqt2.rect.x + rqt2.largura_rqt + bolinha_de_golfe.raio
+            bolinha_de_golfe.rect.x  = rqt2.rect.x + rqt2.largura_rqt + bolinha_de_golfe.raio
             penultimo_chute = ultimo_chute
             ultimo_chute = "esquerda"
             bip.play()
