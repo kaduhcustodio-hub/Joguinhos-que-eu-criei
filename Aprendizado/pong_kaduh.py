@@ -1,99 +1,239 @@
 import pygame
 pygame.init()
+tecla = pygame.key.get_pressed()
 rodando = True
+altura_tela = 600
+largura_tela = 800
 #pontos
 vencedor = "Erro 1109, tá achando que é o Gabriel para roubar assim?"
 pts_player1 = 0
 pts_player2 = 0
+ultimo_chute = ""
+penultimo_chute = ""
 #cores
 branco = (255,255,255)
 vermelho = (255, 0,0)
 azul = (0,0,255)
 verde = (0,255,0)
-#raquete geral
-tmnho_rqt_largura = 15
-tmnho_rqt_altura = 150
-#raquete 1
-cor_rqt1 = branco
-x_rqt1 = 0 + tmnho_rqt_largura
-y_rqt1 = 225 
-#raquete 2
-cor_rqt2 = branco
-x_rqt2 = 790 - tmnho_rqt_largura
-y_rqt2 = 225
-#bolinha de Pong
-x_bol = 400
-y_bol = 300
-raio_bol = 15
-velx_bol = -5
-vely_bol = -5
-cor_bol = branco
+roxo = (87,2,104)
+#raquetes
+rqt_E = False
+rqt_T = False
+rqt_D = False
+rqt_C = False
+#pontos
+E_pts = False
+D_pts = False
+T_pts = False
+C_pts = False
+#config PONG!
 bip = pygame.mixer.Sound("bip.wav")
-def verificar_borda(borda_x, borda_y):
-    global velx_bol, vely_bol, y_rqt1, y_rqt2, x_rqt1, x_rqt2, x_bol, y_bol, pts_player1, pts_player2, cor_bol
-    if x_bol - raio_bol < 0:
-        pts_player2 += 1
-        velx_bol = 5
-        x_bol = 400
-        y_bol = 300
-        cor_bol = branco
-        if cor_rqt1 != branco:
-            bip.play()
-            print("Bip")
-    elif x_bol + raio_bol > borda_x:
-        pts_player1 += 1
-        velx_bol = -5
-        x_bol = 400
-        y_bol = 300
-        cor_bol = branco
-        if cor_rqt1 != branco:
-            bip.play()
-    if y_bol - raio_bol < 0:
-        vely_bol = 5
-        if cor_rqt1 != branco:
-            bip.play()
-    elif y_bol + raio_bol > borda_y:
-        vely_bol = -5
-        if cor_rqt1 != branco:
-            bip.play()
-    if y_rqt1 < 0: 
-        y_rqt1 = 0
-    elif y_rqt1 + tmnho_rqt_altura > borda_y:
-        y_rqt1 = borda_y - tmnho_rqt_altura
-    if y_rqt2 < 0: 
-        y_rqt2 = 0
-    elif y_rqt2 + tmnho_rqt_altura > borda_y:
-        y_rqt2 = borda_y - tmnho_rqt_altura
-def verificar_colisao():
-    global velx_bol, x_bol, cor_bol
-    if (x_bol - raio_bol <= x_rqt1 + tmnho_rqt_largura) and (y_bol + raio_bol >= y_rqt1) and (y_bol - raio_bol <= y_rqt1 + tmnho_rqt_altura):
-        if velx_bol < 0:
-            velx_bol = 5
-            x_bol = x_rqt1 + tmnho_rqt_largura + raio_bol
-        if cor_rqt1 != branco:
-            cor_bol = azul
-            bip.play()
-    if (x_bol + raio_bol >= x_rqt2) and (y_bol + raio_bol >= y_rqt2) and (y_bol - raio_bol <= y_rqt2 + tmnho_rqt_altura):
-        if velx_bol > 0:
-            velx_bol = -5
-            x_bol = x_rqt2 - raio_bol
-        if cor_rqt2 != branco:
-            cor_bol = vermelho
-            bip.play()
 fonte_placar = pygame.font.SysFont(None, 50)
 fonte_fim = pygame.font.SysFont(None, 60)
-tela = pygame.display.set_mode((800, 600))
+tela = pygame.display.set_mode((largura_tela, altura_tela))
 pygame.display.set_caption("Pong: Kaduh Version")
 clock = pygame.time.Clock()
 
+class bolinha:
+    def __init__(self):
+        self.x = 400
+        self.y = 300
+        self.raio = 15
+        self.velx = -5
+        self.vely = -5
+        self.cor = branco
+        self.rect = pygame.Rect(self.x - self.raio, self.y - self.raio, self.raio * 2, self.raio * 2)
+    def mover(self):
+        self.x += self.velx
+        self.y += self.vely
+        self.rect.x = self.x - self.raio
+        self.rect.y = self.y - self.raio
+    def desenhar(self):
+        pygame.draw.circle(tela,branco,(self.x,self.y),self.raio)
+    def verificar_borda(self):
+        global C_pts,T_pts,D_pts,E_pts
+        if self.rect.x <= 0:
+            if rqt_E:
+                E_pts = True
+            else:
+                self.velx *= -1
+                self.x = self.raio
+        if self.rect.y <= 0:
+            if rqt_T:
+                T_pts = True
+            else:
+                self.vely *= -1
+                self.y = self.raio
+        if self.rect.x >= largura_tela:
+            if rqt_D:
+                D_pts = True
+            else:
+                self.velx *= -1
+                self.x = self.raio - largura_tela
+        if self.rect.y >= altura_tela:
+            if rqt_C:
+                C_pts = True
+            else:
+                self.vely *= -1
+                self.y = self.raio - altura_tela
 class raquete:
-    def __init__(self,x,y,lugar):
-        if lugar == "parede":
-            self.rect = pygame.Rect(x,y,40,15)
-        elif lugar == "teto" or lugar == "chão":
-            self.rect = pygame.Rect(x,y,15,40)
+    def __init__(self,lugar,cor):
+        global rqt_C,rqt_D,rqt_T,rqt_E
+        self.lugar = lugar
+        if isinstance(cor, (tuple,list)):
+            self.cor = cor
         else:
+            print("Error 202: Tipo errado para a operação (TypeError)")
+            print("Cor definida como branca")
+            self.cor = (255,255,255)
+        if lugar == "direita" or lugar == "esquerda":
+            self.altura_rqt = 150
+            self.largura_rqt = 15
+            if lugar == "direita":
+                self.tecla_up = pygame.K_UP
+                self.tecla_baixo = pygame.K_DOWN
+                self.x = 775
+                self.y = 225
+                rqt_D = True
+            elif lugar == "esquerda":
+                self.tecla_up = pygame.K_w
+                self.tecla_baixo = pygame.K_s
+                self.x = 15
+                self.y = 225
+                rqt_E = True
+            self.rect = pygame.Rect(self.x,self.y, 15, 150)
+        elif lugar == "teto" or lugar == "chão":
+            self.altura_rqt = 15
+            self.largura_rqt = 150
+            if lugar == "teto":
+                self.tecla_up = pygame.K_o
+                self.tecla_baixo = pygame.K_l
+                self.x = 400
+                self.y = 15
+                rqt_T = True
+            elif lugar == "chão":
+                self.tecla_up = pygame.K_KP8
+                self.tecla_baixo = pygame.K_KP2
+                self.x = 400
+                self.y = 570
+                rqt_C = True
+            self.rect = pygame.Rect(self.x,self.y,15,40)
+        else:
+            global rodando
             print("Erro 203: Valor inválido (ValueError)")
+            rodando = False
+    def verificar_borda(self):
+        if self.lugar == "direita" or self.lugar == "esquerda":
+            if self.rect.y < 0:
+                self.rect.y = 0
+            elif self.rect.y + self.altura_rqt > altura_tela:
+                self.rect.y = altura_tela - self.altura_rqt
+        if self.lugar == "teto" or self.lugar == "chão":
+            if self.rect.x < 0:
+                self.rect.x = 0
+            elif self.rect.x + self.largura_rqt > largura_tela:
+                self.rect.x = largura_tela - self.largura_rqt
+    def mover(self):
+        if self.lugar == "direita" or self.lugar == "esquerda":
+            if tecla[self.tecla_up]:
+                self.rect.y -= 8
+            elif tecla[self.tecla_baixo]:
+                self.rect.y += 8
+        if self.lugar == "teto" or self.lugar == "chão":
+            if tecla[self.tecla_up]:
+                self.rect.x -= 8
+            elif tecla[self.tecla_baixo]:
+                self.rect.x += 8
+        self.verificar_borda()
+    def desenhar(self):
+        pygame.draw.rect(tela, self.cor,self.rect)
+
+def reiniciar_valores():
+    bolinha_de_golfe.x = 400
+    bolinha_de_golfe.y = 300
+    bolinha_de_golfe.velx = -5
+    bolinha_de_golfe.vely = -5
+    #reniciar as raquetes
+    if rqt_T:
+        rqt4.rect.x = 400
+    if rqt_C:
+        rqt3.rect.x = 400
+    if rqt_E:
+        rqt2.rect.y = 225
+    if rqt_D:
+        rqt1.rect.y = 225
+def marcar_pontos():
+    global E_pts, D_pts,T_pts,C_pts,pts_player1,pts_player2,ultimo_chute
+    if E_pts:
+        if ultimo_chute != "esquerda":
+            pts_player2 += 1
+            reiniciar_valores()
+        else:
+            bolinha_de_golfe.x *= -1
+        E_pts = False
+    if D_pts:
+        if ultimo_chute != "direita":
+            pts_player1 += 1
+            reiniciar_valores()
+        else:
+            bolinha_de_golfe.x *= -1
+        D_pts = False
+    if T_pts:
+        if ultimo_chute != "teto":
+            pts_player2 += 1
+            reiniciar_valores()
+        else:
+            bolinha_de_golfe.y *= -1
+        T_pts = False
+    if C_pts:
+        if ultimo_chute != "chão":
+            pts_player1 += 1
+            reiniciar_valores()
+        else:
+            bolinha_de_golfe.y *= -1
+        C_pts = False
+            
+def colisao(): #agora eu vou ficar mentalmente insano.
+    global ultimo_chute,penultimo_chute
+    if bolinha_de_golfe.rect.colliderect(rqt1.rect):
+        if bolinha_de_golfe.velx > 0:
+            bolinha_de_golfe.velx *= -1
+            if abs(bolinha_de_golfe.velx) < 10:
+                bolinha_de_golfe.velx -= 1
+            penultimo_chute = ultimo_chute
+            ultimo_chute = "direita"
+            bip.play()
+    if bolinha_de_golfe.rect.colliderect(rqt2.rect):
+        if bolinha_de_golfe.velx < 0:
+            bolinha_de_golfe.velx *= -1
+            if abs(bolinha_de_golfe.velx) < 10:
+                bolinha_de_golfe.velx += 1
+            penultimo_chute = ultimo_chute
+            ultimo_chute = "esquerda"
+            bip.play()
+    #if bolinha.rect.colidderrect(rqt3):
+        #if bolinha.vely > 0:
+            #bolinha.vely *= -1
+            #if abs(bolinha.vely):
+            #    bolinha.vely -= 1
+            #penultimo_chute = ultimo_chute
+            #ultimo_chute = "chão"
+            #bip.play()
+    #if bolinha.rect.colliderrect(rqt4):
+        #if bolinha.vely < 0:
+            #bolinha.vely *= +1
+            #if abs(bolinha.vely):
+            #    bolinha.vely +=1
+            #penultimo_chute = ultimo_chute
+            #ultimo_chute = "teto"
+            #bip.play()
+
+            
+    
+
+bolinha_de_golfe = bolinha()
+rqt1 = raquete("direita",azul)
+rqt2 = raquete("esquerda",vermelho)
 while rodando:
     clock.tick(30)
     texto_placar = fonte_placar.render(f"Player 1:{pts_player1} Vs Player 2:{pts_player2}", True, branco)
@@ -105,32 +245,21 @@ while rodando:
         if evento.type == pygame.QUIT:
             rodando = False
     if pts_player1 <= 4 and pts_player2 <= 4:
-        pygame.draw.rect(tela, cor_rqt2,(x_rqt2, y_rqt2, tmnho_rqt_largura, tmnho_rqt_altura))
-        pygame.draw.rect(tela, cor_rqt1,(x_rqt1, y_rqt1, tmnho_rqt_largura, tmnho_rqt_altura))
-        y_bol += vely_bol
-        x_bol += velx_bol
-        pygame.draw.circle(tela, cor_bol,(x_bol, y_bol), raio_bol)
-        if tecla[pygame.K_w]:
-            y_rqt1 -= 8
-        elif tecla[pygame.K_s]:
-            y_rqt1 += 8
-        if tecla[pygame.K_UP]:
-            y_rqt2 -= 8
-        elif tecla[pygame.K_DOWN]:
-            y_rqt2 += 8
-        if tecla[pygame.K_k]:
-            cor_rqt1 = azul
-            cor_rqt2 = vermelho
-        elif tecla [pygame.K_b]:
-            cor_rqt1 = branco
-            cor_rqt2 = branco
-            cor_bol = branco
-        verificar_colisao()
-        verificar_borda(800, 600)
+        bolinha_de_golfe.mover()
+        bolinha_de_golfe.verificar_borda()
+        bolinha_de_golfe.desenhar()
+        rqt2.mover()
+        rqt1.mover()
+        rqt1.verificar_borda()
+        rqt2.verificar_borda()
+        rqt1.desenhar()
+        rqt2.desenhar()
+        colisao()
+        marcar_pontos()
         pygame.display.flip()
     else:
-        velx_bol = 0
-        vely_bol = 0
+        bolinha_de_golfe.velx = 0
+        bolinha_de_golfe.vely = 0
         if pts_player1 >= 5:
             vencedor = "Player 1"
         elif pts_player2 >= 5:
@@ -140,10 +269,10 @@ while rodando:
         if tecla[pygame.K_RETURN] or tecla[pygame.K_KP_ENTER]:
             pts_player1 = 0
             pts_player2 = 0
-            velx_bol = -5
-            vely_bol = -5
-            y_rqt2 = 225
-            y_rqt1 = 225
+            bolinha_de_golfe.velx = -5
+            bolinha_de_golfe.vely = -5
+            rqt2.rect.y = 225
+            rqt1.rect.y = 225
 
 
 pygame.quit()
