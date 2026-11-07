@@ -234,9 +234,6 @@ def colisao(): #agora eu vou ficar mentalmente insano.
             #ultimo_chute = "teto"
             #bip.play()
 
-            
-    
-
 bolinha_de_golfe = bolinha()
 rqt1 = raquete("direita",azul)
 rqt2 = raquete("esquerda",vermelho)
