@@ -371,6 +371,7 @@ def jogar_pong(modo):
         rqt4 = None
         limite = 255
         limite_nara = 10
+        reiniciar_valores(rqt1,rqt2,rqt3,rqt4)
     elif modo == 1:
         rqt1 = raquete("esquerda",azul)
         rqt2 = raquete("direita",vermelho)
@@ -378,6 +379,7 @@ def jogar_pong(modo):
         rqt4 = None
         limite = 10
         limite_nara = 10
+        reiniciar_valores(rqt1,rqt2,rqt3,rqt4)
     elif modo == 2:
         rqt1 = raquete("esquerda",azul)
         rqt2 = raquete("direita",vermelho)
@@ -385,6 +387,7 @@ def jogar_pong(modo):
         rqt4 = None
         limite = 10
         limite_nara = 10
+        reiniciar_valores(rqt1,rqt2,rqt3,rqt4)
     elif modo == 3:
         rqt1 = raquete("esquerda",azul)
         rqt2 = raquete("direita",vermelho)
@@ -392,6 +395,7 @@ def jogar_pong(modo):
         rqt4 = raquete("chão",roxo)
         limite = 10
         limite_nara = 10
+        reiniciar_valores(rqt1,rqt2,rqt3,rqt4)
     while jogando:
         clock.tick(30)
         texto_fim_jogo = fonte_fim.render(f"Fim De jogo o {vencedor} Ganhou!", True, verde)
