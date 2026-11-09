@@ -19,6 +19,8 @@ vermelho = (255, 0,0)
 azul = (0,0,255)
 verde = (0,255,0)
 roxo = (87,2,104)
+fundo_cor = (0, 0, 20)
+menu_bolinha = (0, 20, 20)
 #raquetes
 rqt_E = False
 rqt_T = False
@@ -33,11 +35,16 @@ C_pts = False
 estado = "menu"
 bip = pygame.mixer.Sound("data/bip.wav")
 fonte_placar = pygame.font.SysFont(None, 50)
+fonte_placar_pequeno = pygame.font.SysFont(None, 25)
 fonte_fim = pygame.font.SysFont(None, 60)
 tela = pygame.display.set_mode((largura_tela, altura_tela))
 pygame.display.set_caption("Pong: Kaduh Version")
 clock = pygame.time.Clock()
-
+single_player_rect = pygame.Rect(275, 180, 250, 50)
+two_player_rect = pygame.Rect(275, 245, 250, 50)
+three_player_rect = pygame.Rect(275, 310, 250, 50)
+four_player_rect = pygame.Rect(275, 375, 250, 50)
+exit = pygame.Rect(275, 440, 250, 50)
 class bolinha:
     def __init__(self):
         self.x = 400
@@ -45,7 +52,10 @@ class bolinha:
         self.raio = 15
         self.velx = -5
         self.vely = -5
-        self.cor = branco
+        if estado != "menu":
+            self.cor = branco
+        else:
+            self.cor = menu_bolinha
         self.rect = pygame.Rect(self.x - self.raio, self.y - self.raio, self.raio * 2, self.raio * 2)
     def mover(self):
         self.x += self.velx
@@ -116,8 +126,8 @@ class raquete:
                 self.y = 15
                 rqt_T = True
             elif lugar == "chão":
-                self.tecla_up = pygame.K_KP8
-                self.tecla_baixo = pygame.K_KP2
+                self.tecla_up = pygame.K_KP4
+                self.tecla_baixo = pygame.K_KP6
                 self.x = 400
                 self.y = 570
                 rqt_C = True
@@ -150,7 +160,7 @@ class raquete:
                 self.rect.x += 8
         self.verificar_borda()
     def desenhar(self):
-        pygame.draw.rect(tela, self.cor,self.rect)
+        pygame.draw.rect(tela, self.cor,self.rect, 3)
 
 
 def louca_lavada_evita_paulada():
@@ -261,10 +271,11 @@ def colisao(rqt1,rqt2,rqt3,rqt4,modo): #agora eu vou ficar mentalmente insano.
                 ultimo_chute = "chão"
                 bip.play()
 class Nara(raquete):
-    def __init__(self, lugar, cor, nivel = 1):
+    def __init__(self, lugar, cor, nivel = 255):
         super().__init__(lugar, cor)
         self.nivel = nivel
     def mover(self,bolinha):
+        global Modo_doido
         self.difereca = abs(bolinha.y - self.rect.centery)
         if self.nivel >= 1 and self.nivel <= 9:
             if self.difereca >= 200 and bolinha.rect.x >= 400 and bolinha.velx > 0:
@@ -299,14 +310,16 @@ class Nara(raquete):
         if self.nivel >= 255:
             if self.difereca > 1 and bolinha.rect.x >= 400 and bolinha.velx > 0:
                 if bolinha.y > self.rect.centery:
-                    self.rect.y += 10
+                    self.rect.y += abs(bolinha_de_golfe.velx) + 10
                 if bolinha.y < self.rect.centery:
-                    self.rect.y -= 10
+                    self.rect.y -= abs(bolinha_de_golfe.velx) + 10
+                Modo_doido = True
 class Nara2(raquete):
-    def __init__(self, lugar, cor, nivel = 1):
+    def __init__(self, lugar, cor, nivel = 255):
         super().__init__(lugar, cor)
         self.nivel = nivel
     def mover(self,bolinha):
+        global Modo_doido
         self.difereca = abs(bolinha.y - self.rect.centery)
         if self.nivel >= 1 and self.nivel <= 9:
             if self.difereca >= 200 and bolinha.rect.x <= 400 and bolinha.velx < 0:
@@ -341,12 +354,14 @@ class Nara2(raquete):
         if self.nivel >= 255:
             if self.difereca > 1 and bolinha.rect.x <= 400 and bolinha.velx < 0:
                 if bolinha.y > self.rect.centery:
-                    self.rect.y += 10
+                    self.rect.y += abs(bolinha_de_golfe.velx) + 10
                 if bolinha.y < self.rect.centery:
-                    self.rect.y -= 10
+                    self.rect.y -= abs(bolinha_de_golfe.velx) + 10
+                Modo_doido = True
 bolinha_de_golfe = bolinha()
+local = 0
 def jogar_pong(modo):
-    global rodando,vencedor,estado
+    global rodando,vencedor,estado,pts_player1,pts_player2,pts_player3,pts_player4
     estado = "jogando"
     jogando = True
     if modo == 0:
@@ -355,28 +370,28 @@ def jogar_pong(modo):
         rqt3 = None
         rqt4 = None
         limite = 255
-        texto_placar = fonte_placar.render(f":Jogador 1{pts_player1} Vs Nara:{pts_player2}", True, branco)
+        limite_nara = 10
     elif modo == 1:
         rqt1 = raquete("esquerda",azul)
         rqt2 = raquete("direita",vermelho)
         rqt3 = None
         rqt4 = None
         limite = 10
-        texto_placar = fonte_placar.render(f":Jogador 1:{pts_player1} Vs Jogador 2:{pts_player2}", True, branco)
+        limite_nara = 10
     elif modo == 2:
         rqt1 = raquete("esquerda",azul)
         rqt2 = raquete("direita",vermelho)
         rqt3 = raquete("teto", verde)
         rqt4 = None
         limite = 10
-        texto_placar = fonte_placar.render(f":Jogador 1{pts_player1} Vs Jogador 2:{pts_player2} vs Jogador 3:{pts_player3}", True, branco)
+        limite_nara = 10
     elif modo == 3:
         rqt1 = raquete("esquerda",azul)
         rqt2 = raquete("direita",vermelho)
         rqt3 = raquete("teto",verde)
         rqt4 = raquete("chão",roxo)
-        texto_placar = fonte_placar.render(f":Jogador 1{pts_player1} Vs Jogador 2:{pts_player2} vs Jogador 3:{pts_player3} Vs Jogador 4:{pts_player4}", True, branco)
         limite = 10
+        limite_nara = 10
     while jogando:
         clock.tick(30)
         texto_fim_jogo = fonte_fim.render(f"Fim De jogo o {vencedor} Ganhou!", True, verde)
@@ -386,7 +401,7 @@ def jogar_pong(modo):
             if evento.type == pygame.QUIT:
                 rodando = False
                 jogando = False
-        if pts_player1 < limite and pts_player2 < limite:
+        if pts_player1 < limite and pts_player2 < limite_nara and pts_player3 < limite and pts_player4 < limite:
             bolinha_de_golfe.mover()
             bolinha_de_golfe.verificar_borda()
             rqt1.mover(tecla)
@@ -409,14 +424,23 @@ def jogar_pong(modo):
             bolinha_de_golfe.desenhar()
             colisao(rqt1,rqt2,rqt3,rqt4,modo)
             marcar_pontos(modo,rqt1,rqt2,rqt3,rqt4)
-            tela.blit(texto_placar, (190,20))
+            if modo == 0:
+                texto_placar = fonte_placar.render(f"Jogador 1:{pts_player1} Vs Nara:{pts_player2}", True, branco)           
+            elif modo == 1:
+                texto_placar = fonte_placar.render(f"Jogador 1:{pts_player1} Vs Jogador 2:{pts_player2}", True, branco)
+            elif modo == 2:
+                texto_placar = fonte_placar.render(f"Jogador 1:{pts_player1} Vs Jogador 2:{pts_player2} vs Jogador 3:{pts_player3}", True, branco)
+            elif modo == 3:
+                texto_placar = fonte_placar_pequeno.render(f"Jogador 1:{pts_player1} Vs Jogador 2:{pts_player2} vs Jogador 3:{pts_player3} Vs Jogador 4:{pts_player4}", True, branco)
+            texto_rect = texto_placar.get_rect(center=(largura_tela // 2, 30))
+            tela.blit(texto_placar, texto_rect)
             pygame.display.flip()
         else:
                 bolinha_de_golfe.velx = 0
                 bolinha_de_golfe.vely = 0
                 if pts_player1 >= limite:
                     vencedor = "Player 1"
-                elif pts_player2 >= limite:
+                elif pts_player2 >= limite_nara:
                     if modo == 0:
                         vencedor = "Nara"
                     else:
@@ -430,19 +454,109 @@ def jogar_pong(modo):
                 if tecla[pygame.K_RETURN] or tecla[pygame.K_KP_ENTER]:
                     jogando = False
                     jogar_pong(modo)
-        
-local = 0
+                if tecla[pygame.K_ESCAPE] or tecla[pygame.K_SPACE]:
+                    jogando = False
+                    estado = "menu"
+                    pts_player1 = 0
+                    pts_player2 = 0
+                    pts_player3 = 0
+                    pts_player4 = 0
+
 while rodando:
     clock.tick(30)
-    tela.fill((0,0,0))
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    if single_player_rect.collidepoint(mouse_x, mouse_y):
+        cor_da_borda_1 = verde
+    else:
+        cor_da_borda_1 = branco
+    if two_player_rect.collidepoint(mouse_x, mouse_y):
+        cor_da_borda_2 = verde
+    else:
+        cor_da_borda_2 = branco
+    if three_player_rect.collidepoint(mouse_x, mouse_y):
+        cor_da_borda_3 = verde
+    else:
+        cor_da_borda_3 = branco
+    if four_player_rect.collidepoint(mouse_x, mouse_y):
+        cor_da_borda_4 = verde
+    else:
+        cor_da_borda_4 = branco
+    if exit.collidepoint(mouse_x, mouse_y):
+        cor_da_borda_5 = vermelho
+    else:
+        cor_da_borda_5 = branco
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             rodando = False
+        if evento.type == pygame.MOUSEBUTTONDOWN:
+                if single_player_rect.collidepoint(evento.pos):
+                    jogar_pong(0)
+                    pts_player1 = 0
+                    pts_player2 = 0
+                    pts_player3 = 0
+                    pts_player4 = 0
+                elif two_player_rect.collidepoint(evento.pos):
+                    jogar_pong(1)
+                    pts_player1 = 0
+                    pts_player2 = 0
+                    pts_player3 = 0
+                    pts_player4 = 0
+                elif three_player_rect.collidepoint(evento.pos):
+                    jogar_pong(2)
+                    pts_player1 = 0
+                    pts_player2 = 0
+                    pts_player3 = 0
+                    pts_player4 = 0
+                elif four_player_rect.collidepoint(evento.pos):
+                    jogar_pong(3)
+                    pts_player1 = 0
+                    pts_player2 = 0
+                    pts_player3 = 0
+                    pts_player4 = 0
+                elif exit.collidepoint(evento.pos):
+                    rodando = False
     if estado == "menu":
         local += 1
+        tela.fill(fundo_cor)
         if local == 1:
-            print("Você está no menu")
-            jogar_pong(2)
-        
+            rqt1 = Nara2("esquerda",branco,nivel= 254)
+            rqt2 = Nara("direita",branco,nivel= 254)
+        rqt3 = None
+        rqt4 = None
+        bolinha_de_golfe.mover()
+        bolinha_de_golfe.verificar_borda()
+        bolinha_de_golfe.desenhar()
+        rqt2.mover(bolinha_de_golfe)
+        rqt1.mover(bolinha_de_golfe)
+        rqt1.verificar_borda()
+        rqt2.verificar_borda()
+        rqt1.desenhar()
+        rqt2.desenhar()
+        colisao(rqt1,rqt2,rqt3,rqt4,0)
+        marcar_pontos(0,rqt1,rqt2,rqt3,rqt4)
+        titulo = fonte_fim.render("PONG: KADUH VERSION", True, verde)
+        titulo_rect = titulo.get_rect(center=(largura_tela // 2, 80))
+        tela.blit(titulo, titulo_rect)
+        pygame.draw.rect(tela, cor_da_borda_1, single_player_rect, 3)
+        txt_1p = fonte_placar.render("1 Jogador", True, verde)
+        txt_1p_rect = txt_1p.get_rect(center=single_player_rect.center)
+        tela.blit(txt_1p, txt_1p_rect)
+        pygame.draw.rect(tela, cor_da_borda_2, two_player_rect, 3)
+        txt_2p = fonte_placar.render("2 Jogador", True, verde)
+        txt_2p_rect = txt_2p.get_rect(center=two_player_rect.center)
+        tela.blit(txt_2p, txt_2p_rect)
+        pygame.draw.rect(tela, cor_da_borda_3, three_player_rect, 3)
+        txt_3p = fonte_placar.render("3 Jogador", True, verde)
+        txt_3p_rect = txt_3p.get_rect(center=three_player_rect.center)
+        tela.blit(txt_3p, txt_3p_rect)
+        pygame.draw.rect(tela, cor_da_borda_4, four_player_rect, 3)
+        txt_4p = fonte_placar.render("4 Jogador", True, verde)
+        txt_4p_rect = txt_4p.get_rect(center=four_player_rect.center)
+        tela.blit(txt_4p, txt_4p_rect)
+        pygame.draw.rect(tela, cor_da_borda_5, exit, 3)
+        txt_5p = fonte_placar.render("Sair", True, vermelho)
+        txt_5p_rect = txt_5p.get_rect(center=exit.center)
+        tela.blit(txt_5p, txt_5p_rect)
+        pygame.display.flip()
     
 pygame.quit()
