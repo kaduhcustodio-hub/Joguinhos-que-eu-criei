@@ -366,7 +366,7 @@ def jogar_pong(modo):
     jogando = True
     if modo == 0:
         rqt1 = raquete("esquerda",azul)
-        rqt2 = Nara("direita",vermelho)
+        rqt2 = Nara("direita",vermelho,nivel= 1)
         rqt3 = None
         rqt4 = None
         limite = 255
